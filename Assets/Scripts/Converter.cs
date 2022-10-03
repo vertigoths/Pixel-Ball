@@ -7,6 +7,7 @@ public class Converter : MonoBehaviour
 {
     [SerializeField] private Sprite sprite;
     [SerializeField] private GameObject pixelBlock;
+    private GameObject[,] _map;
 
     public void CreateThreeDimensionalModel()
     {
@@ -14,6 +15,7 @@ public class Converter : MonoBehaviour
         var squaredLength = Mathf.Sqrt(pixels.Length);
         var parentPixelBlock = new GameObject();
         var scale = pixelBlock.transform.localScale.x;
+        _map = new GameObject[(int) squaredLength, (int) squaredLength];
 
         for (var i = 0; i < pixels.Length; i++)
         {
@@ -25,6 +27,13 @@ public class Converter : MonoBehaviour
                 spawnedPixelBlock.GetComponent<MeshRenderer>().material.color = pixels[i];
                 spawnedPixelBlock.transform.SetParent(parentPixelBlock.transform);
                 spawnedPixelBlock.transform.localScale *= 0.99f;
+
+                var posY = (int)(i / squaredLength);
+                var posX = (int)(i % squaredLength);
+                
+                _map[posY, posX] = spawnedPixelBlock;
+                
+                _map[posY, posX].name = posY + "-" + posX;
             }
         }
     }
@@ -32,5 +41,10 @@ public class Converter : MonoBehaviour
     private float GetMagnitude(Color color)
     {
         return color.r + color.g + color.b;
+    }
+
+    public GameObject[,] GetMap()
+    {
+        return _map;
     }
 }

@@ -5,6 +5,13 @@ using UnityEngine;
 
 public class Ground : MonoBehaviour
 {
+    private RayWeapon _rayWeapon;
+
+    private void Awake()
+    {
+        _rayWeapon = FindObjectOfType<RayWeapon>();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         
@@ -12,6 +19,8 @@ public class Ground : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        var indices = other.name.Split("-");
+        _rayWeapon.RemoveFromMap(int.Parse(indices[1]), int.Parse(indices[0]));
         other.gameObject.SetActive(false);
     }
 }
