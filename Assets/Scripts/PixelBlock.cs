@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -18,7 +19,14 @@ public class PixelBlock : MonoBehaviour
             
             var material = transform.GetComponent<MeshRenderer>().material;
 
-            material.Lerp(material, other.GetComponent<MeshRenderer>().material, 0.5f);
+            StartCoroutine(ChangeColorOvertime(material, other.gameObject));
         }
+    }
+
+    private IEnumerator ChangeColorOvertime(Material material, GameObject other)
+    {
+        material.Lerp(material, other.GetComponent<MeshRenderer>().material, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+        material.Lerp(material, material, 0.5f);
     }
 }

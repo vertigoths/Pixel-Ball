@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Enums;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class BallSpawner : MonoBehaviour
 {
     private BlockController _blockController;
+    private LevelController _levelController;
     private LinkedList<GameObject> _createdBalls;
 
     [SerializeField] private GameObject ballPrefab;
@@ -18,6 +20,7 @@ public class BallSpawner : MonoBehaviour
     private void Awake()
     {
         _blockController = FindObjectOfType<BlockController>();
+        _levelController = FindObjectOfType<LevelController>();
         _createdBalls = new LinkedList<GameObject>();
 
         _countOfSpawnedBalls = 2;
@@ -31,9 +34,11 @@ public class BallSpawner : MonoBehaviour
 
     private void Start()
     {
+        var parent = new GameObject();
+        
         for (var i = 0; i < 20; i++)
         {
-            var spawnedBall = Instantiate(ballPrefab);
+            var spawnedBall = Instantiate(ballPrefab, parent.transform, true);
             spawnedBall.GetComponent<Ball>().OnCreate(_blockController);
             spawnedBall.SetActive(false);
             _createdBalls.AddLast(spawnedBall);
@@ -42,7 +47,10 @@ public class BallSpawner : MonoBehaviour
 
     private void Update()
     {
-        StartCoroutine(CallBallToAction());
+        if (_levelController.GetGameState() == GameState.Play)
+        {
+            StartCoroutine(CallBallToAction());
+        }
     }
 
     private IEnumerator CallBallToAction()

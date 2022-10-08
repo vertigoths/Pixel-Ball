@@ -6,7 +6,6 @@ using UnityEngine;
 public class BlockController : MonoBehaviour
 {
     private GameObject[,] _map;
-
     private int _blockCount;
     
     public void RemoveFromMap(int posX, int posY)
@@ -30,6 +29,7 @@ public class BlockController : MonoBehaviour
         _map = map;
 
         StoreBlocksCount(_map);
+        FindObjectOfType<UIController>().SetTotalBlockCount(_blockCount);
     }
 
     private void StoreBlocksCount(GameObject[,] map)
