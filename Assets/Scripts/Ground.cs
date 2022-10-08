@@ -5,22 +5,23 @@ using UnityEngine;
 
 public class Ground : MonoBehaviour
 {
-    private RayWeapon _rayWeapon;
+    private BallSpawner _ballSpawner;
 
     private void Awake()
     {
-        _rayWeapon = FindObjectOfType<RayWeapon>();
+        _ballSpawner = FindObjectOfType<BallSpawner>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        
-    }
+        if (other.gameObject.GetComponent<Ball>())
+        {
+            _ballSpawner.AddBallBack(other.gameObject);
+        }
 
-    private void OnTriggerExit(Collider other)
-    {
-        var indices = other.name.Split("-");
-        _rayWeapon.RemoveFromMap(int.Parse(indices[1]), int.Parse(indices[0]));
-        other.gameObject.SetActive(false);
+        else
+        {
+            other.gameObject.SetActive(false);
+        }
     }
 }

@@ -13,7 +13,9 @@ public class Converter : MonoBehaviour
     {
         var pixels = sprite.texture.GetPixels();
         var squaredLength = Mathf.Sqrt(pixels.Length);
+
         var parentPixelBlock = new GameObject();
+
         var scale = pixelBlock.transform.localScale.x;
         _map = new GameObject[(int) squaredLength, (int) squaredLength];
 
@@ -23,7 +25,7 @@ public class Converter : MonoBehaviour
             {
                 var spawnedPixelBlock = Instantiate(pixelBlock, new Vector3((i % squaredLength) * scale, 
                     (int)(i / squaredLength) * scale, Random.Range(0f, 0.05f)), Quaternion.identity);
-
+                
                 spawnedPixelBlock.GetComponent<MeshRenderer>().material.color = pixels[i];
                 spawnedPixelBlock.transform.SetParent(parentPixelBlock.transform);
                 spawnedPixelBlock.transform.localScale *= 0.99f;
@@ -36,6 +38,8 @@ public class Converter : MonoBehaviour
                 _map[posY, posX].name = posY + "-" + posX;
             }
         }
+
+        parentPixelBlock.transform.position = new Vector3(-2f, 0.5f, -0.75f);
     }
 
     private float GetMagnitude(Color color)
