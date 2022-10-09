@@ -10,11 +10,12 @@ public class Ground : MonoBehaviour
     private LinkedList<GameObject> _splashes;
 
     private UIController _uiController;
-    
+
     private void Awake()
     {
         _ballSpawner = FindObjectOfType<BallSpawner>();
         _uiController = FindObjectOfType<UIController>();
+
         _splashes = new LinkedList<GameObject>();
         var parent = new GameObject();
 
@@ -36,7 +37,7 @@ public class Ground : MonoBehaviour
         else
         {
             other.gameObject.SetActive(false);
-            _uiController.OnBlockCollect();
+            _uiController.OnBlockCollect(other.gameObject.transform.position);
             
             if (_splashes.Count > 0)
             {
@@ -44,7 +45,7 @@ public class Ground : MonoBehaviour
                 _splashes.RemoveFirst();
                 
                 splash.SetActive(true);
-                splash.transform.localPosition = other.gameObject.transform.localPosition + new Vector3(0f, 0.38f, 0f);
+                splash.transform.localPosition = other.gameObject.transform.position + new Vector3(0f, 0.38f, 0f);
                 splash.GetComponent<ParticleSystem>().Play();
 
                 StartCoroutine(AddSplashBack(splash));

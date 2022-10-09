@@ -40,7 +40,7 @@ public class Ball : MonoBehaviour
             var posX = int.Parse(indices[1]);
             var posY = int.Parse(indices[0]);
 
-            if (_blockController.IsExistInMap(posY, posX))
+            if (_blockController.IsExistInMap(posY, posX) && !_blockController.GetDidFinish())
             {
                 _blockController.RemoveFromMap(posX, posY);
             }

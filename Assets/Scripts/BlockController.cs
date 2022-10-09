@@ -7,6 +7,8 @@ public class BlockController : MonoBehaviour
 {
     private GameObject[,] _map;
     private int _blockCount;
+
+    private bool _didFinish = false;
     
     public void RemoveFromMap(int posX, int posY)
     {
@@ -17,11 +19,36 @@ public class BlockController : MonoBehaviour
         {
             FindObjectOfType<LevelController>().ChangeGameState(GameState.End);
         }
+        
+        if (CheckIfThereIsLessBlocks())
+        {
+            FindObjectOfType<BallSpawner>().ReverseCanThrow();
+            RemoveRemainingBlocks();
+
+            StartCoroutine(FindObjectOfType<GameController>().StartGame(3f));
+            _blockCount = 0;
+            _didFinish = true;
+        }
     }
     
     public bool CheckIfAllBlocksRemoved()
     {
         return _blockCount == 0;
+    }
+
+    private bool CheckIfThereIsLessBlocks()
+    {
+        return _blockCount <= 20;
+    }
+
+    public bool GetDidFinish()
+    {
+        return _didFinish;
+    }
+
+    public void ResetDidFinish()
+    {
+        _didFinish = false;
     }
 
     public void SetMapReference(GameObject[,] map)
@@ -64,6 +91,21 @@ public class BlockController : MonoBehaviour
         var randomBlockIndex = Random.Range(0, availableBlocks.Count);
 
         return availableBlocks[randomBlockIndex];
+    }
+
+    private void RemoveRemainingBlocks()
+    {
+        for (var i = 0; i < _map.GetLength(0); i++)
+        {
+            for (var j = 0; j < _map.GetLength(1); j++)
+            {
+                if (_map[i, j])
+                {
+                    _map[i,j].GetComponent<PixelBlock>().OnBallTouch(null);
+                    _map[i, j] = null;
+                }
+            }
+        }
     }
 
     public bool IsExistInMap(int posY, int posX)

@@ -12,7 +12,6 @@ public class LevelController : MonoBehaviour
     private void Start()
     {
         _currentLevel = PlayerPrefs.GetInt("CurrentLevel");
-        _gameState = GameState.Menu;
     }
 
     public GameState GetGameState()

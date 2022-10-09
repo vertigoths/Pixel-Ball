@@ -9,6 +9,7 @@ public class BallSpawner : MonoBehaviour
 {
     private BlockController _blockController;
     private LevelController _levelController;
+    private UIController _uiController;
     private LinkedList<GameObject> _createdBalls;
 
     [SerializeField] private GameObject ballPrefab;
@@ -16,25 +17,33 @@ public class BallSpawner : MonoBehaviour
 
     private bool[] _canSpawnBall;
     private int _countOfSpawnedBalls;
+    private float _delayBetweenThrows;
+
+    private bool _canThrow;
 
     private void Awake()
     {
         _blockController = FindObjectOfType<BlockController>();
         _levelController = FindObjectOfType<LevelController>();
+        _uiController = FindObjectOfType<UIController>();
+    }
+
+    private void Start()
+    {
+        var parent = new GameObject();
         _createdBalls = new LinkedList<GameObject>();
 
-        _countOfSpawnedBalls = 2;
+        _countOfSpawnedBalls = 4;
+        _delayBetweenThrows = 1f;
+        
         _canSpawnBall = new bool[_countOfSpawnedBalls];
 
         for (var i = 0; i < _countOfSpawnedBalls; i++)
         {
             _canSpawnBall[i] = true;
         }
-    }
-
-    private void Start()
-    {
-        var parent = new GameObject();
+        
+        _uiController.SetProgressText(_countOfSpawnedBalls, _delayBetweenThrows);
         
         for (var i = 0; i < 20; i++)
         {
@@ -47,10 +56,15 @@ public class BallSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (_levelController.GetGameState() == GameState.Play)
+        if (_levelController.GetGameState() == GameState.Play && _canThrow)
         {
             StartCoroutine(CallBallToAction());
         }
+    }
+
+    public void ReverseCanThrow()
+    {
+        _canThrow = !_canThrow;
     }
 
     private IEnumerator CallBallToAction()
@@ -73,7 +87,7 @@ public class BallSpawner : MonoBehaviour
                 _canSpawnBall[i] = true;
             }
             
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(Random.Range(0.2f, 0.3f));
         }
     }
 

@@ -7,14 +7,14 @@ using UnityEngine;
 
 public class Converter : MonoBehaviour
 {
-    [SerializeField] private Sprite sprite;
+    [SerializeField] private Sprite[] sprites;
     [SerializeField] private GameObject pixelBlock;
     private GameObject[,] _map;
     private Vector3 _hardcodedScale = new Vector3(0.15f, 0.15f, 0.15f);
 
     public void CreateThreeDimensionalModel()
     {
-        var pixels = sprite.texture.GetPixels();
+        var pixels = sprites[Random.Range(0, sprites.Length)].texture.GetPixels();
         var squaredLength = Mathf.Sqrt(pixels.Length);
 
         var parent = new GameObject();
@@ -22,7 +22,20 @@ public class Converter : MonoBehaviour
         var scale = pixelBlock.transform.localScale.x;
         _map = new GameObject[(int) squaredLength, (int) squaredLength];
 
-        StartCoroutine(IterateOverMap(pixels, squaredLength, scale, parent));
+        IterateOverMap(pixels, squaredLength, scale, parent);
+
+        var localPosition = parent.transform.localPosition;
+        Vector3[] path =
+        {
+            localPosition,
+            new Vector3(localPosition.x + Random.Range(-0.45f, 0.45f), localPosition.y + Random.Range(-0.45f, 0.45f), localPosition.z), 
+            new Vector3(localPosition.x + Random.Range(-0.45f, 0.45f), localPosition.y + Random.Range(-0.45f, 0.45f), localPosition.z),
+            localPosition
+        };
+
+        parent.transform.DOLocalPath(path, 12f, PathType.CatmullRom).SetLoops(25);
+        FindObjectOfType<BlockController>().SetMapReference(_map);
+        PlayerPrefs.Save();
     }
 
     private float GetMagnitude(Color color)
@@ -30,7 +43,7 @@ public class Converter : MonoBehaviour
         return color.r + color.g + color.b;
     }
 
-    private IEnumerator IterateOverMap(IReadOnlyList<Color> pixels, float squaredLength, float scale, GameObject parent)
+    private void IterateOverMap(IReadOnlyList<Color> pixels, float squaredLength, float scale, GameObject parent)
     {
         var halfOfPixels = pixels.Count / 2;
         
@@ -38,12 +51,7 @@ public class Converter : MonoBehaviour
         {
             SpawnBlock(pixels, squaredLength, scale, parent, halfOfPixels - i);
             SpawnBlock(pixels, squaredLength, scale, parent, halfOfPixels + i);
-
-            yield return null;
         }
-        
-        FindObjectOfType<LevelController>().ChangeGameState(GameState.Play);
-        FindObjectOfType<BlockController>().SetMapReference(_map);
     }
 
     private void SpawnBlock(IReadOnlyList<Color> pixels, float squaredLength, float scale, GameObject parentPixelBlock, int index)
@@ -52,7 +60,7 @@ public class Converter : MonoBehaviour
         {
             var spawnedPixelBlock = Instantiate(pixelBlock, new Vector3((index % squaredLength) * scale,
                                                                 (int)(index / squaredLength) * scale, Random.Range(0f, 0.05f))
-                                                            + new Vector3(-2f, 0.5f, -0.75f), Quaternion.identity);
+                                                            + new Vector3(-2.185f, 0.5f, -0.75f), Quaternion.identity);
 
             spawnedPixelBlock.GetComponent<MeshRenderer>().material.color = pixels[index];
             spawnedPixelBlock.transform.SetParent(parentPixelBlock.transform);
