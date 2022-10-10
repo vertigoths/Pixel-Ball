@@ -25,11 +25,8 @@ public class UIController : MonoBehaviour
     private float _totalBlockCount;
     private float _currentBlockCount;
 
-    private BlockController _blockController;
-
     private void Awake()
     {
-        _blockController = FindObjectOfType<BlockController>();
         _camera = FindObjectOfType<Camera>();
     }
 

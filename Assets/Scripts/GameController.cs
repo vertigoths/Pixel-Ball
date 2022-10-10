@@ -11,8 +11,8 @@ public class GameController : MonoBehaviour
     private BallSpawner _ballSpawner;
     private BlockController _blockController;
     
-    private bool _canCreate = true;
-
+    private bool _canRetrieve = true;
+    
     private void Awake()
     {
         _converter = FindObjectOfType<Converter>();
@@ -23,25 +23,25 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(StartGame(1f));
+        StartCoroutine(LoadModel(0.75f));
     }
 
-    public IEnumerator StartGame(float delayTime)
+    private IEnumerator LoadModel(float delayTime)
     {
-        if (_canCreate)
+        if (_canRetrieve)
         {
-            _canCreate = false;
+            _canRetrieve = false;
             
             yield return new WaitForSeconds(delayTime);
-        
+            
             _converter.CreateThreeDimensionalModel();
-        
+
             _levelController.ChangeGameState(GameState.Play);
             _ballSpawner.ReverseCanThrow();
             
             _blockController.ResetDidFinish();
-
-            _canCreate = true;
+            
+            _canRetrieve = true;
         }
     }
 }

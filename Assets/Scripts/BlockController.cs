@@ -8,7 +8,8 @@ public class BlockController : MonoBehaviour
     private GameObject[,] _map;
     private int _blockCount;
 
-    private bool _didFinish = false;
+    private bool _didFinish;
+    private int _currentIterationCount;
     
     public void RemoveFromMap(int posX, int posY)
     {
@@ -24,8 +25,7 @@ public class BlockController : MonoBehaviour
         {
             FindObjectOfType<BallSpawner>().ReverseCanThrow();
             RemoveRemainingBlocks();
-
-            StartCoroutine(FindObjectOfType<GameController>().StartGame(3f));
+            
             _blockCount = 0;
             _didFinish = true;
         }

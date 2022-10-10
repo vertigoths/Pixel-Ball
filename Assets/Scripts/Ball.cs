@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Ball : MonoBehaviour
 {
@@ -23,13 +24,13 @@ public class Ball : MonoBehaviour
         Vector3[] path =
         {
             targetPos, 
-            new Vector3(transform.localPosition.x * 1.33f, -3.5f, -0.4f)
+            new Vector3(transform.localPosition.x * Random.Range(0.85f, 1.15f), -3.5f, -0.4f)
         };
         
         /*transform.DOLocalJump(targetPos, 1f, 1, 1.25f)
             .OnComplete(() => transform.DOLocalJump(, 1f, 1, 1.25f))};*/
 
-        transform.DOLocalPath(path, 2f, PathType.CatmullRom);
+        transform.DOLocalPath(path, 4f, PathType.CatmullRom);
     }
 
     private void OnTriggerEnter(Collider other)

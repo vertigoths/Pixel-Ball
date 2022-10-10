@@ -16,9 +16,10 @@ public class BallSpawner : MonoBehaviour
     private readonly Vector3 _ballSpawnPosition = new Vector3(0, -0.5f, -0.75f);
 
     private bool[] _canSpawnBall;
+    private GameObject[] _spawnedBalls;
+    
     private int _countOfSpawnedBalls;
-    private float _delayBetweenThrows;
-
+    
     private bool _canThrow;
 
     private void Awake()
@@ -33,17 +34,17 @@ public class BallSpawner : MonoBehaviour
         var parent = new GameObject();
         _createdBalls = new LinkedList<GameObject>();
 
-        _countOfSpawnedBalls = 4;
-        _delayBetweenThrows = 1f;
-        
+        _countOfSpawnedBalls = 1;
+
         _canSpawnBall = new bool[_countOfSpawnedBalls];
+        _spawnedBalls = new GameObject[_countOfSpawnedBalls];
 
         for (var i = 0; i < _countOfSpawnedBalls; i++)
         {
             _canSpawnBall[i] = true;
         }
         
-        _uiController.SetProgressText(_countOfSpawnedBalls, _delayBetweenThrows);
+        _uiController.SetProgressText(_countOfSpawnedBalls, 0f);
         
         for (var i = 0; i < 20; i++)
         {
@@ -58,7 +59,7 @@ public class BallSpawner : MonoBehaviour
     {
         if (_levelController.GetGameState() == GameState.Play && _canThrow)
         {
-            StartCoroutine(CallBallToAction());
+            CallBallToAction();
         }
     }
 
@@ -67,7 +68,7 @@ public class BallSpawner : MonoBehaviour
         _canThrow = !_canThrow;
     }
 
-    private IEnumerator CallBallToAction()
+    private void CallBallToAction()
     {
         for (var i = 0; i < _countOfSpawnedBalls; i++)
         {
@@ -79,28 +80,23 @@ public class BallSpawner : MonoBehaviour
             
                 if (_createdBalls.Count != 0)
                 {
-                    TryToSendBall(targetBlock);
+                    TryToSendBall(targetBlock, i);
                 }
-
-                yield return new WaitForSeconds(1.5f);
-
-                _canSpawnBall[i] = true;
             }
-            
-            yield return new WaitForSeconds(Random.Range(0.2f, 0.3f));
         }
     }
 
-    private void TryToSendBall(GameObject targetBlock)
+    private void TryToSendBall(GameObject targetBlock, int index)
     {
-        var calledBall = _createdBalls.First.Value;
-        _createdBalls.RemoveFirst();
+        var calledBall = _createdBalls.Last.Value;
+        _createdBalls.RemoveLast();
         
         if (targetBlock)
         {
             calledBall.SetActive(true);
-            calledBall.transform.position = _ballSpawnPosition + new Vector3(Random.Range(-1f, 1f), 0f, 0f);
+            //calledBall.transform.position = _ballSpawnPosition + new Vector3(Random.Range(-1f, 1f), 0f, 0f);
 
+            _spawnedBalls[index] = calledBall;
             calledBall.GetComponent<Ball>().OnCall(targetBlock.transform.position);
         }
 
@@ -112,7 +108,13 @@ public class BallSpawner : MonoBehaviour
 
     public void AddBallBack(GameObject returnedBall)
     {
-        returnedBall.SetActive(false);
+        for (var i = 0; i < _spawnedBalls.Length; i++)
+        {
+            if (_spawnedBalls[i] == returnedBall)
+            {
+                _canSpawnBall[i] = true;
+            }
+        }
         _createdBalls.AddLast(returnedBall);
     }
 }

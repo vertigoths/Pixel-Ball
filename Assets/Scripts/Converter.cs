@@ -21,7 +21,7 @@ public class Converter : MonoBehaviour
 
         var scale = pixelBlock.transform.localScale.x;
         _map = new GameObject[(int) squaredLength, (int) squaredLength];
-
+        
         IterateOverMap(pixels, squaredLength, scale, parent);
 
         var localPosition = parent.transform.localPosition;
