@@ -38,7 +38,7 @@ public class Ground : MonoBehaviour
         {
             other.gameObject.SetActive(false);
             _uiController.OnBlockCollect(other.gameObject.transform.position);
-            
+
             if (_splashes.Count > 0)
             {
                 var splash = _splashes.First.Value;

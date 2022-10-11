@@ -1,19 +1,14 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Enums;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class BallSpawner : MonoBehaviour
 {
     private BlockController _blockController;
     private LevelController _levelController;
-    private UIController _uiController;
     private LinkedList<GameObject> _createdBalls;
 
     [SerializeField] private GameObject ballPrefab;
-    private readonly Vector3 _ballSpawnPosition = new Vector3(0, -0.5f, -0.75f);
 
     private bool[] _canSpawnBall;
     private GameObject[] _spawnedBalls;
@@ -22,19 +17,30 @@ public class BallSpawner : MonoBehaviour
     
     private bool _canThrow;
 
+    private float _ballReachTime;
+
     private void Awake()
     {
         _blockController = FindObjectOfType<BlockController>();
         _levelController = FindObjectOfType<LevelController>();
-        _uiController = FindObjectOfType<UIController>();
     }
 
     private void Start()
     {
         var parent = new GameObject();
         _createdBalls = new LinkedList<GameObject>();
+        
+        _countOfSpawnedBalls = PlayerPrefs.GetInt("BallCount");
+        if (_countOfSpawnedBalls == 0)
+        {
+            _countOfSpawnedBalls = 1;
+        }
 
-        _countOfSpawnedBalls = 1;
+        _ballReachTime = PlayerPrefs.GetFloat("BallReachTime");
+        if (_ballReachTime == 0)
+        {
+            _ballReachTime = 4f;
+        }
 
         _canSpawnBall = new bool[_countOfSpawnedBalls];
         _spawnedBalls = new GameObject[_countOfSpawnedBalls];
@@ -43,9 +49,7 @@ public class BallSpawner : MonoBehaviour
         {
             _canSpawnBall[i] = true;
         }
-        
-        _uiController.SetProgressText(_countOfSpawnedBalls, 0f);
-        
+
         for (var i = 0; i < 20; i++)
         {
             var spawnedBall = Instantiate(ballPrefab, parent.transform, true);
@@ -94,10 +98,9 @@ public class BallSpawner : MonoBehaviour
         if (targetBlock)
         {
             calledBall.SetActive(true);
-            //calledBall.transform.position = _ballSpawnPosition + new Vector3(Random.Range(-1f, 1f), 0f, 0f);
 
             _spawnedBalls[index] = calledBall;
-            calledBall.GetComponent<Ball>().OnCall(targetBlock.transform.position);
+            calledBall.GetComponent<Ball>().OnCall(targetBlock.transform.position, _ballReachTime);
         }
 
         else
@@ -116,5 +119,30 @@ public class BallSpawner : MonoBehaviour
             }
         }
         _createdBalls.AddLast(returnedBall);
+    }
+
+    public void IncreaseCountOfBall()
+    {
+        _countOfSpawnedBalls++;
+    }
+
+    public void BoostBallReachTime()
+    {
+        _ballReachTime *= 0.5f;
+    }
+
+    public void TakeBackBallReachTimeBoost()
+    {
+        _ballReachTime *= 2f;
+    }
+
+    public void DecreaseBallReachTime()
+    {
+        _ballReachTime -= 0.2f;
+    }
+
+    public void SetProgressText()
+    {
+        ProgressBar.Instance.SetProgressText(_countOfSpawnedBalls, _ballReachTime);
     }
 }

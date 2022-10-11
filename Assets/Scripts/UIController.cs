@@ -5,6 +5,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Voodoo.Utils;
 using Random = UnityEngine.Random;
 
 public class UIController : MonoBehaviour
@@ -12,22 +13,23 @@ public class UIController : MonoBehaviour
     [SerializeField] private TMP_Text currentLevelText;
     [SerializeField] private TMP_Text nextLevelText;
     [SerializeField] private TMP_Text currentMoneyText;
-    [SerializeField] private TMP_Text currentProgressText;
     [SerializeField] private GameObject groundMoneyPrefab;
     [SerializeField] private Canvas canvas;
-    
-    [SerializeField] private Slider progressBar;
-    
+
     private LinkedList<GameObject> _groundMoneys;
 
     private Camera _camera;
 
-    private float _totalBlockCount;
-    private float _currentBlockCount;
+    [SerializeField] private Upgrade[] upgrades;
 
+    private bool _letBoost = true;
+
+    private BallSpawner _ballSpawner;
+    
     private void Awake()
     {
         _camera = FindObjectOfType<Camera>();
+        _ballSpawner = FindObjectOfType<BallSpawner>();
     }
 
     private void Start()
@@ -48,16 +50,8 @@ public class UIController : MonoBehaviour
 
     public void OnBlockCollect(Vector3 pos)
     {
-        _currentBlockCount += 1;
-        progressBar.value = _currentBlockCount / _totalBlockCount;
+        ProgressBar.Instance.OnBlockCollect();
         CreateGroundMoney(pos);
-    }
-
-    public void SetTotalBlockCount(int totalBlockCount)
-    {
-        _currentBlockCount = 0;
-        _totalBlockCount = totalBlockCount;
-        progressBar.value = _currentBlockCount / _totalBlockCount;
     }
 
     private void CreateGroundMoney(Vector3 pos)
@@ -82,8 +76,29 @@ public class UIController : MonoBehaviour
         _groundMoneys.AddLast(groundMoney);
     }
 
-    public void SetProgressText(int ballCount, float delayCount)
+    public void OnScreenTouch()
     {
-        currentProgressText.text = ballCount + " Balls/" + delayCount + " sec";
+        StartCoroutine(ControlScreenTouch());
+    }
+
+    private IEnumerator ControlScreenTouch()
+    {
+        if (_letBoost)
+        {
+            _letBoost = false;
+            
+            Vibrations.Haptic (HapticTypes.LightImpact);
+            
+            _ballSpawner.BoostBallReachTime();
+            _ballSpawner.SetProgressText();
+
+            yield return new WaitForSeconds(0.25f);
+            
+            _ballSpawner.TakeBackBallReachTimeBoost();
+            _ballSpawner.SetProgressText();
+
+            _letBoost = true;
+        }
+        
     }
 }

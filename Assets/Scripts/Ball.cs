@@ -14,12 +14,12 @@ public class Ball : MonoBehaviour
         _blockController = blockController;
     }
 
-    public void OnCall(Vector3 targetPos)
+    public void OnCall(Vector3 targetPos, float ballReachTime)
     {
-        JumpToTarget(targetPos);
+        JumpToTarget(targetPos, ballReachTime);
     }
     
-    private void JumpToTarget(Vector3 targetPos)
+    private void JumpToTarget(Vector3 targetPos, float ballReachTime)
     {
         Vector3[] path =
         {
@@ -27,10 +27,7 @@ public class Ball : MonoBehaviour
             new Vector3(transform.localPosition.x * Random.Range(0.85f, 1.15f), -3.5f, -0.4f)
         };
         
-        /*transform.DOLocalJump(targetPos, 1f, 1, 1.25f)
-            .OnComplete(() => transform.DOLocalJump(, 1f, 1, 1.25f))};*/
-
-        transform.DOLocalPath(path, 4f, PathType.CatmullRom);
+        transform.DOLocalPath(path, ballReachTime, PathType.CatmullRom);
     }
 
     private void OnTriggerEnter(Collider other)

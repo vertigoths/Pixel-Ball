@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Enums;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BlockController : MonoBehaviour
 {
@@ -10,17 +11,14 @@ public class BlockController : MonoBehaviour
 
     private bool _didFinish;
     private int _currentIterationCount;
+
+    [SerializeField] private GameObject confettiPrefab;
     
     public void RemoveFromMap(int posX, int posY)
     {
         _map[posY, posX] = null;
         _blockCount -= 1;
 
-        if (CheckIfAllBlocksRemoved())
-        {
-            FindObjectOfType<LevelController>().ChangeGameState(GameState.End);
-        }
-        
         if (CheckIfThereIsLessBlocks())
         {
             FindObjectOfType<BallSpawner>().ReverseCanThrow();
@@ -28,6 +26,8 @@ public class BlockController : MonoBehaviour
             
             _blockCount = 0;
             _didFinish = true;
+            
+            StartCoroutine(OnGameEnd());
         }
     }
     
@@ -56,7 +56,7 @@ public class BlockController : MonoBehaviour
         _map = map;
 
         StoreBlocksCount(_map);
-        FindObjectOfType<UIController>().SetTotalBlockCount(_blockCount);
+        ProgressBar.Instance.SetTotalBlockCount(_blockCount);
     }
 
     private void StoreBlocksCount(GameObject[,] map)
@@ -101,7 +101,7 @@ public class BlockController : MonoBehaviour
             {
                 if (_map[i, j])
                 {
-                    _map[i,j].GetComponent<PixelBlock>().OnBallTouch(null);
+                    _map[i, j].GetComponent<PixelBlock>().OnBallTouch(null);
                     _map[i, j] = null;
                 }
             }
@@ -111,5 +111,14 @@ public class BlockController : MonoBehaviour
     public bool IsExistInMap(int posY, int posX)
     {
         return _map[posY, posX];
+    }
+
+    private IEnumerator OnGameEnd()
+    {
+        FindObjectOfType<LevelController>().ChangeGameState(GameState.End);
+        Instantiate(confettiPrefab);
+
+        yield return new WaitForSeconds(3.5f);
+        SceneManager.LoadScene("Game");
     }
 }
