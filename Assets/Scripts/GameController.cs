@@ -12,9 +12,12 @@ public class GameController : MonoBehaviour
     private BlockController _blockController;
     
     private bool _canRetrieve = true;
+
+    [SerializeField] private GameObject boostScreen;
     
     private void Awake()
     {
+        boostScreen.SetActive(false);
         _converter = FindObjectOfType<Converter>();
         _levelController = FindObjectOfType<LevelController>();
         _ballSpawner = FindObjectOfType<BallSpawner>();
@@ -28,9 +31,15 @@ public class GameController : MonoBehaviour
             PlayerPrefs.SetInt("BallCount", 1);
         }
 
-        if (PlayerPrefs.GetFloat("BallReachTime") == 0)
+        var ballReachTime = PlayerPrefs.GetFloat("BallReachTime");
+
+        if (ballReachTime == 0)
         {
             PlayerPrefs.SetFloat("BallReachTime", 4f);
+        }
+        else if(ballReachTime <= 2f)
+        {
+            PlayerPrefs.SetFloat("BallReachTime", ballReachTime * 2f);
         }
 
         StartCoroutine(LoadModel(0.75f));
@@ -43,7 +52,7 @@ public class GameController : MonoBehaviour
             _canRetrieve = false;
             
             yield return new WaitForSeconds(delayTime);
-            
+
             _converter.CreateThreeDimensionalModel();
 
             _levelController.ChangeGameState(GameState.Play);
@@ -52,6 +61,7 @@ public class GameController : MonoBehaviour
             _blockController.ResetDidFinish();
             
             _canRetrieve = true;
+            boostScreen.SetActive(true);
         }
     }
 }

@@ -129,6 +129,13 @@ public class UIController : MonoBehaviour
             _ballSpawner.SetProgressText();
 
             _letBoost = true;
+
+            var speed = PlayerPrefs.GetFloat("BallReachTime");
+
+            if (speed <= 2f)
+            {
+                PlayerPrefs.SetFloat("BallReachTime", speed * 2f);
+            }
         }
     }
 

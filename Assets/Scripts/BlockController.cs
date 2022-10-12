@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Enums;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class BlockController : MonoBehaviour
 {
@@ -15,7 +17,15 @@ public class BlockController : MonoBehaviour
 
     [SerializeField] private GameObject confettiPrefab;
     [SerializeField] private Image _image;
-    
+
+    private LevelController _levelController;
+    [SerializeField] private GameObject boostScreen;
+
+    private void Awake()
+    {
+        _levelController = FindObjectOfType<LevelController>();
+    }
+
     public void RemoveFromMap(int posX, int posY)
     {
         _map[posY, posX] = null;
@@ -117,7 +127,8 @@ public class BlockController : MonoBehaviour
 
     private IEnumerator OnGameEnd()
     {
-        FindObjectOfType<LevelController>().ChangeGameState(GameState.End);
+        boostScreen.SetActive(false);
+        _levelController.ChangeGameState(GameState.End);
         Instantiate(confettiPrefab);
         PlayerPrefs.SetInt("CurrentIterationLevel", PlayerPrefs.GetInt("CurrentIterationLevel") + 1);
         

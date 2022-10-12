@@ -2718,6 +2718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   confettiPrefab: {fileID: 7102495447825360187, guid: c0e7f02b967bf4c4e99878b7956b0d14, type: 3}
   _image: {fileID: 64214781}
+  boostScreen: {fileID: 1668404440}
 --- !u!1 &1197991664
 GameObject:
   m_ObjectHideFlags: 0
@@ -3390,6 +3391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5502552e1333e4b459f1b831c9dcb8d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boostScreen: {fileID: 1668404440}
 --- !u!1001 &1578009120
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3397,6 +3399,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 996070405491005938, guid: 4f82d26fdb67ce544b30748758227c78, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6022101894030961963, guid: 4f82d26fdb67ce544b30748758227c78, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 6022101894179711720, guid: 4f82d26fdb67ce544b30748758227c78, type: 3}
       propertyPath: m_Size.y
       value: 2.766097
@@ -3416,6 +3426,10 @@ PrefabInstance:
     - target: {fileID: 6022101894179711720, guid: 4f82d26fdb67ce544b30748758227c78, type: 3}
       propertyPath: m_Center.z
       value: 0.29997826
+      objectReference: {fileID: 0}
+    - target: {fileID: 6022101894179711723, guid: 4f82d26fdb67ce544b30748758227c78, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6022101894534689776, guid: 4f82d26fdb67ce544b30748758227c78, type: 3}
       propertyPath: m_LocalPosition.y

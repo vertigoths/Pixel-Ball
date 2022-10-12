@@ -41,6 +41,10 @@ public class BallSpawner : MonoBehaviour
         {
             _ballReachTime = 4f;
         }
+        else if(_ballReachTime <= 2f)
+        {
+            PlayerPrefs.SetFloat("BallReachTime", _ballReachTime * 2f);
+        }
 
         _canSpawnBall = new bool[_countOfSpawnedBalls];
         _spawnedBalls = new GameObject[_countOfSpawnedBalls];
@@ -147,7 +151,15 @@ public class BallSpawner : MonoBehaviour
 
     public void DecreaseBallReachTime()
     {
-        _ballReachTime -= 0.2f;
+        if (_ballReachTime > 2f)
+        {
+            _ballReachTime -= 0.2f;
+        }
+        else
+        {
+            _ballReachTime -= 0.1f;
+        }
+        
         PlayerPrefs.SetFloat("BallReachTime", _ballReachTime);
     }
 
