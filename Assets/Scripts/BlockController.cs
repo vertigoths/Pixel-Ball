@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Enums;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class BlockController : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class BlockController : MonoBehaviour
     private int _currentIterationCount;
 
     [SerializeField] private GameObject confettiPrefab;
+    [SerializeField] private Image _image;
     
     public void RemoveFromMap(int posX, int posY)
     {
@@ -117,6 +119,19 @@ public class BlockController : MonoBehaviour
     {
         FindObjectOfType<LevelController>().ChangeGameState(GameState.End);
         Instantiate(confettiPrefab);
+        PlayerPrefs.SetInt("CurrentIterationLevel", PlayerPrefs.GetInt("CurrentIterationLevel") + 1);
+        
+        if (PlayerPrefs.GetInt("CurrentIterationLevel") == 4)
+        {
+            PlayerPrefs.SetInt("CurrentIterationLevel", 0);
+            var currentLevel = PlayerPrefs.GetInt("CurrentLevel") + 1;
+
+            PlayerPrefs.DeleteAll();
+            
+            PlayerPrefs.SetInt("CurrentLevel", currentLevel);
+            
+            _image.color = Color.green;
+        }
 
         yield return new WaitForSeconds(3.5f);
         SceneManager.LoadScene("Game");

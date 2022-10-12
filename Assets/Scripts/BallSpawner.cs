@@ -124,6 +124,15 @@ public class BallSpawner : MonoBehaviour
     public void IncreaseCountOfBall()
     {
         _countOfSpawnedBalls++;
+        _canSpawnBall = new bool[_countOfSpawnedBalls];
+        _spawnedBalls = new GameObject[_countOfSpawnedBalls];
+
+        for (var i = 0; i < _countOfSpawnedBalls; i++)
+        {
+            _canSpawnBall[i] = true;
+        }
+
+        PlayerPrefs.SetInt("BallCount", _countOfSpawnedBalls);
     }
 
     public void BoostBallReachTime()
@@ -139,6 +148,7 @@ public class BallSpawner : MonoBehaviour
     public void DecreaseBallReachTime()
     {
         _ballReachTime -= 0.2f;
+        PlayerPrefs.SetFloat("BallReachTime", _ballReachTime);
     }
 
     public void SetProgressText()

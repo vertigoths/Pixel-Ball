@@ -13,6 +13,11 @@ public class Upgrade : MonoBehaviour
     private int[] _priceData;
 
     private BallSpawner _ballSpawner;
+    private UIController _uiController;
+
+    private bool _canBuy;
+
+    [SerializeField] private TMP_Text moneyText;
 
     private void Awake()
     {
@@ -24,32 +29,63 @@ public class Upgrade : MonoBehaviour
         _currentLevel = PlayerPrefs.GetInt(upgradeType);
         _priceText = transform.GetChild(3).GetComponent<TMP_Text>();
         _image = GetComponent<Image>();
+        _image.color = Color.gray;
         _ballSpawner = FindObjectOfType<BallSpawner>();
+        _uiController = FindObjectOfType<UIController>();
 
         _priceData = GetRelatedData();
 
-        _priceText.text = "$" + _priceData[_currentLevel];
+        if (_currentLevel == _priceData.Length)
+        {
+            _priceText.text = "MAX";
+        }
+        else
+        {
+            _priceText.text = "$" + _priceData[_currentLevel];
+        }
     }
     
     private void Increase()
     {
-        PlayerPrefs.SetInt(upgradeType, ++_currentLevel);
+        if (_canBuy && _currentLevel < _priceData.Length)
+        {
+            var price = _priceData[_currentLevel];
+            var nextMoney = PlayerPrefs.GetInt("CurrentMoney") - price;
+            PlayerPrefs.SetInt("CurrentMoney", nextMoney);
         
-        if (upgradeType.Equals("Ball"))
-        {
-            _ballSpawner.IncreaseCountOfBall();
+            if (upgradeType.Equals("Ball"))
+            {
+                _ballSpawner.IncreaseCountOfBall();
+            }
+            else if (upgradeType.Equals("Time"))
+            {
+                _ballSpawner.DecreaseBallReachTime();
+            }
+            else if(upgradeType.Equals("Money"))
+            {
+                _uiController.IncreaseMoneyGetAmount();
+            }
+
+            if (_currentLevel == _priceData.Length)
+            {
+                _priceText.text = "MAX";
+                _image.color = Color.red;
+            }
+            else
+            {
+                _uiController.SetCurrentMoney(nextMoney);
+                
+                moneyText.text = "$" + nextMoney;
+                _image.color = Color.grey;
+                _canBuy = false;
+                
+                PlayerPrefs.SetInt(upgradeType, ++_currentLevel);
+                
+                _priceText.text = "$" + _priceData[_currentLevel];
+                
+                _ballSpawner.SetProgressText();
+            }
         }
-        else if (upgradeType.Equals("Time"))
-        {
-            _ballSpawner.TakeBackBallReachTimeBoost();
-            _ballSpawner.DecreaseBallReachTime();
-        }
-        else
-        {
-            
-        }
-        
-        _ballSpawner.SetProgressText();
     }
 
     public void OnClick()
@@ -67,8 +103,21 @@ public class Upgrade : MonoBehaviour
         };
     }
 
-    public void OnMoneyIncrease(int currentMoney)
+    public void OnMoneyCollect(int currentMoney)
     {
-        
+        if (_currentLevel != _priceData.Length && currentMoney >= _priceData[_currentLevel])
+        {
+            _image.color = Color.green;
+            _canBuy = true;
+        }
+    }
+
+    public void CheckIfCanBuy(int nextMoney)
+    {
+        if (_currentLevel != _priceData.Length && nextMoney < _priceData[_currentLevel])
+        {
+            _image.color = Color.grey;
+            _canBuy = false;
+        }
     }
 }

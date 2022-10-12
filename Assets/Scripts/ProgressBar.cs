@@ -7,14 +7,11 @@ public class ProgressBar : MonoBehaviour
     public static ProgressBar Instance;
     private Slider _progressBar;
     private TMP_Text _currentProgressText;
-    
+
     private float _totalBlockCount;
     private float _currentBlockCount;
 
     private int _currentIterationLevel;
-
-    private int _ballCount;
-    private float _ballReachTime;
 
     private void Awake()
     {
@@ -33,12 +30,10 @@ public class ProgressBar : MonoBehaviour
     {
         _currentIterationLevel = PlayerPrefs.GetInt("CurrentIterationLevel");
         _progressBar = FindObjectOfType<Slider>();
-        
+
         _currentProgressText = _progressBar.transform.parent.GetChild(0).GetComponent<TMP_Text>();
-
-        _ballCount = PlayerPrefs.GetInt("BallCount");
-        _ballReachTime = PlayerPrefs.GetFloat("BallReachTime");
-
+        FindObjectOfType<BallSpawner>().SetProgressText();
+        
         _progressBar.value = _currentIterationLevel * 0.25f;
         
         _totalBlockCount = currentBlockCount * 4;
@@ -51,6 +46,9 @@ public class ProgressBar : MonoBehaviour
 
     public void SetProgressText(int ballCount, float ballReachTime)
     {
-        _currentProgressText.text = ballCount + " Balls/" + ballReachTime + " sec";
+        if (_currentProgressText != null)
+        {
+            _currentProgressText.text = ballCount + " Balls/" + ballReachTime + " sec";
+        }
     }
 }

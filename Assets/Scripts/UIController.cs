@@ -20,12 +20,14 @@ public class UIController : MonoBehaviour
 
     private Camera _camera;
 
-    [SerializeField] private Upgrade[] upgrades;
-
     private bool _letBoost = true;
 
     private BallSpawner _ballSpawner;
-    
+    private int _currentMoney;
+    private int _moneyGetAmount;
+
+    [SerializeField] private Upgrade[] _upgrades;
+
     private void Awake()
     {
         _camera = FindObjectOfType<Camera>();
@@ -37,6 +39,15 @@ public class UIController : MonoBehaviour
         var currentLevel = PlayerPrefs.GetInt("CurrentLevel");
         currentLevelText.text = (currentLevel + 1).ToString();
         nextLevelText.text = (currentLevel + 2).ToString();
+
+        _currentMoney = PlayerPrefs.GetInt("CurrentMoney");
+        currentMoneyText.text = "$" + _currentMoney;
+
+        _moneyGetAmount = PlayerPrefs.GetInt("MoneyGetAmount");
+        if (_moneyGetAmount == 0)
+        {
+            _moneyGetAmount = 1;
+        }
 
         _groundMoneys = new LinkedList<GameObject>();
 
@@ -50,8 +61,27 @@ public class UIController : MonoBehaviour
 
     public void OnBlockCollect(Vector3 pos)
     {
+        _currentMoney += _moneyGetAmount;
+        PlayerPrefs.SetInt("CurrentMoney", _currentMoney);
+        currentMoneyText.text = "$" + _currentMoney;
+
         ProgressBar.Instance.OnBlockCollect();
         CreateGroundMoney(pos);
+
+        for (var i = 0; i < _upgrades.Length; i++)
+        {
+            _upgrades[i].OnMoneyCollect(_currentMoney);
+        }
+    }
+
+    public void SetCurrentMoney(int nextMoney)
+    {
+        _currentMoney = nextMoney;
+
+        for (var i = 0; i < _upgrades.Length; i++)
+        {
+            _upgrades[i].CheckIfCanBuy(nextMoney);
+        }
     }
 
     private void CreateGroundMoney(Vector3 pos)
@@ -61,6 +91,7 @@ public class UIController : MonoBehaviour
             var groundMoney = _groundMoneys.First.Value;
             _groundMoneys.RemoveFirst();
             groundMoney.SetActive(true);
+            groundMoney.GetComponent<TMP_Text>().text = "$" + _moneyGetAmount;
             groundMoney.transform.position = _camera.WorldToScreenPoint(pos);
 
             groundMoney.transform.DOLocalMoveY(0f, Random.Range(2f, 2.5f));
@@ -78,6 +109,7 @@ public class UIController : MonoBehaviour
 
     public void OnScreenTouch()
     {
+        Vibrations.Haptic(HapticTypes.LightImpact);
         StartCoroutine(ControlScreenTouch());
     }
 
@@ -86,19 +118,22 @@ public class UIController : MonoBehaviour
         if (_letBoost)
         {
             _letBoost = false;
-            
-            Vibrations.Haptic (HapticTypes.LightImpact);
-            
+
             _ballSpawner.BoostBallReachTime();
             _ballSpawner.SetProgressText();
 
-            yield return new WaitForSeconds(0.25f);
-            
+            yield return new WaitForSeconds(1f);
+
             _ballSpawner.TakeBackBallReachTimeBoost();
+
             _ballSpawner.SetProgressText();
 
             _letBoost = true;
         }
-        
+    }
+
+    public void IncreaseMoneyGetAmount()
+    {
+        PlayerPrefs.SetInt("MoneyGetAmount", ++_moneyGetAmount);
     }
 }

@@ -38,11 +38,6 @@ public class GameController : MonoBehaviour
 
     private IEnumerator LoadModel(float delayTime)
     {
-        if (PlayerPrefs.GetInt("CurrentIterationLevel") == 4)
-        {
-            PlayerPrefs.SetInt("CurrentIterationLevel", 0);
-        }
-        
         if (_canRetrieve)
         {
             _canRetrieve = false;
@@ -50,7 +45,6 @@ public class GameController : MonoBehaviour
             yield return new WaitForSeconds(delayTime);
             
             _converter.CreateThreeDimensionalModel();
-            PlayerPrefs.SetInt("CurrentIterationLevel", PlayerPrefs.GetInt("CurrentIterationLevel") + 1);
 
             _levelController.ChangeGameState(GameState.Play);
             _ballSpawner.ReverseCanThrow();
